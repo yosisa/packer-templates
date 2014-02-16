@@ -1,0 +1,46 @@
+{
+    "builders": [
+        {
+            "type": "vmware-iso",
+            "vm_name": "CentOS-6.5-x64",
+            "guest_os_type": "centos-64",
+            "headless": "true",
+
+            "iso_url": "http://ftp.iij.ad.jp/pub/linux/centos/6.5/isos/x86_64/CentOS-6.5-x86_64-minimal.iso",
+            "iso_checksum": "f21a71e8e31df73297bdd1ccd4a64a36831284bd",
+            "iso_checksum_type": "sha1",
+
+            "http_directory": ".",
+
+            "ssh_username": "vagrant",
+            "ssh_password": "vagrant",
+            "ssh_wait_timeout": "20m",
+
+            "tools_upload_flavor": "linux",
+            "tools_upload_path": "/tmp/{{.Flavor}}.iso",
+
+            "shutdown_command": "echo vagrant | sudo -S shutdown -P now",
+            "boot_command": [
+                "<tab> text ks=http://{{.HTTPIP}}:{{.HTTPPort}}/ks.cfg<enter><wait>"
+            ]
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | {{.Vars}} sudo -E -S sh '{{.Path}}'",
+            "scripts": [
+                "scripts/base.sh",
+                "scripts/vagrant.sh",
+                "scripts/vmware.sh",
+                "scripts/cleanup.sh"
+            ]
+        }
+    ],
+    "post-processors": [
+        {
+            "type": "vagrant",
+            "output": "centos-6.5-x64-vmware.box"
+        }
+    ]
+}
